@@ -10,6 +10,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import PrivateRoute from './components/PrivateRoute';
 import LogoutRoute from './components/LogoutRoute';
 import Footer from './components/Footer';
+import ErrorPage from './pages/ErrorPage';
 
 
 
@@ -27,6 +28,7 @@ export default function App() {
         <Route path='/admin' element={<PrivateRoute><AdminDashboard /></PrivateRoute>} />
         <Route path="/register" element={<LogoutRoute><Register /> </LogoutRoute>} />
         <Route path="/login" element={<LogoutRoute><Login /></LogoutRoute>} />
+        <Route path="*" element={<ErrorPage />} />
       </Routes>
       <Footer />
     </>
