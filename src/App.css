@@ -1,0 +1,44 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+@font-face {
+    font-family: 'Helvetica Neue';
+    src: url('./assets/fonts/HelveticaNeueLight.ttf') format('truetype');
+    font-weight: 300;
+}
+
+@font-face {
+    font-family: 'Helvetica Neue';
+    src: url('./assets/fonts/HelveticaNeueMedium.ttf') format('truetype');
+    font-weight: 500;
+}
+
+@font-face {
+    font-family: 'Helvetica Neue';
+    src: url('./assets/fonts/HelveticaNeueBold.ttf') format('truetype');
+    font-weight: 700;
+}
+
+@font-face {
+    font-family: 'Helvetica Neue';
+    src: url('./assets/fonts/HelveticaNeueBlack.ttf') format('truetype');
+    font-weight: 900;
+}
+
+/* Majalla fallback */
+@font-face {
+    font-family: 'Sakkal Majalla';
+    src: url('./assets/fonts/majalla.ttf') format('truetype');
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: 'Sakkal Majalla';
+    src: url('./assets/fonts/majallab.ttf') format('truetype');
+    font-weight: bold;
+}
+
+/* تطبيق الخط الافتراضي لكل المشروع */
+body {
+    font-family: 'Helvetica Neue', 'Sakkal Majalla', Arial, sans-serif;
+}
