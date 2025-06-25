@@ -1,6 +1,6 @@
-import React from 'react';
-import { Button } from 'react-daisyui';
-import { useNavigate } from 'react-router-dom';
+
+
+import { useNavigate } from 'react-router';
 import { Ghost } from 'lucide-react';
 
 const ErrorPage = () => {
@@ -13,13 +13,13 @@ const ErrorPage = () => {
             <h1 className="text-5xl font-bold mb-2">404</h1>
             <p className="text-xl mb-6">Oops! The page you're looking for doesn't exist.</p>
 
-            <Button
+            <button
                 color="primary"
                 onClick={() => navigate('/')}
-                className="rounded-full px-8 py-3 text-lg shadow-md transition-all duration-300 hover:scale-105"
+                className="rounded-full px-8 py-3 text-lg shadow-md transition-all duration-300 hover:scale-105 cursor-pointer"
             >
                 Go Back Home
-            </Button>
+            </button>
         </div>
     );
 };
