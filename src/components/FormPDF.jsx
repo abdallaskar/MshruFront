@@ -239,7 +239,7 @@ const FormPDF = ({ form }) => (
                         <Text>{form.networkPhone || ''}</Text>
                     </View>
                     <View style={[styles.cell, { width: '33.33%' }]}>
-                        <Text>{form.mobile || ''}</Text>
+                        <Text>{form.phone || ''}</Text>
                     </View>
                     <View style={[styles.cell, { width: '33.33%', borderRight: 'none' }]}>
                         <Text>{form.email || ''}</Text>
@@ -383,13 +383,13 @@ const FormPDF = ({ form }) => (
                 </View>
                 <View style={styles.tableRow}>
                     <View style={[styles.cell, { width: '33.33%' }]}>
-                        <Text>{form.performanceIndicators?.[2]?.indicator || ''}</Text>
+                        <Text>{form.performanceIndicators?.[2]?.value || ''}</Text>
                     </View>
                     <View style={[styles.cell, { width: '33.33%' }]}>
-                        <Text>{form.performanceIndicators?.[1]?.indicator || ''}</Text>
+                        <Text>{form.performanceIndicators?.[1]?.value || ''}</Text>
                     </View>
                     <View style={[styles.cell, { width: '33.33%', borderRight: 'none' }]}>
-                        <Text>{form.performanceIndicators?.[0]?.indicator || ''}</Text>
+                        <Text>{form.performanceIndicators?.[0]?.value || ''}</Text>
                     </View>
                 </View>
 
@@ -406,7 +406,7 @@ const FormPDF = ({ form }) => (
                 {/* Proposed procedures */}
                 <View style={styles.tableRow}>
                     <View style={[styles.cell, { width: '75%' }]}>
-                        <Text>{form.proposedProcedures || ''}</Text>
+                        <Text>{form.uniqueProcedures || ''}</Text>
                     </View>
                     <View style={[styles.headerCell, { width: '25%', borderRight: 'none' }]}>
                         <Text>الإجراءات المقترحة للتعامل معها</Text>
