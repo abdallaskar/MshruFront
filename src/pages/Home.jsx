@@ -134,11 +134,16 @@ export default function Home() {
                 </div>
               </div>
             ) : (
-              <div className="text-center py-12 text-gray-500 text-2xl">
-                <div className="text-6xl mb-4">📋</div>
-                لا توجد نماذج محفوظة حتى الآن.
-              </div>
-            )}
+
+              user.role === 'user' ?
+                (<div className="text-center py-12 text-gray-500 text-2xl">
+                  <div className="text-6xl mb-4">📋</div>
+                  لا توجد نماذج محفوظة حتى الآن.
+                </div>)
+                : (null))
+            }
+
+
           </>
         )}
 
