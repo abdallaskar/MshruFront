@@ -32,7 +32,7 @@ export default function AdminDashboard() {
 
   const handleExport = async () => {
     try {
-      const response = await axiosInstance.get('http://localhost:5000/api/export/forms', {
+      const response = await axiosInstance.get('/export/forms', {
         responseType: 'blob',
       });
       const url = window.URL.createObjectURL(new Blob([response.data]));
