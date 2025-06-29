@@ -15,14 +15,14 @@ export default function Navbar() {
 
   return (
     <nav
-      className="sticky top-0 w-full z-50 bg-gradient-to-r from-[#3D7EB9] via-[#0DA9A6] to-[#07A869]  text-white px-8 py-3 flex items-center justify-between shadow-md"
+      className="sticky top-0 w-full z-50 bg-[#0DA9A6]  text-white px-8 py-3 flex items-center justify-between shadow-md"
       dir="rtl"
       style={{ fontFamily: "'Helvetica Neue', 'Sakkal Majalla'" }}
     >
       {/* Right: Logo and Home Button */}
       <div className="flex items-center space-x-reverse">
         <button
-          className="mr-4 p-2 rounded-xl hover:bg-[#0c8b89] transition-colors cursor-pointer"
+          className="mr-4 p-2 rounded-xl  bg-gradient-to-r from-[#3D7EB9] via-[#0DA9A6] to-[#07A869] hover:bg-[#15445A] transition-colors cursor-pointer"
           onClick={() => navigate('/')}
           aria-label="الصفحة الرئيسية"
         >

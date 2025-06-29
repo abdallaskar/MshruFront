@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import axiosInstance from '../api/axios';
 import { toast } from 'react-toastify';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
+import ar from 'react-phone-input-2/lang/ar.json';
 
 export default function Form() {
     const location = useLocation();
@@ -127,7 +130,7 @@ export default function Form() {
                 authorityDate: '',
                 authoritySignature: ''
             })
-            navigate('/form');
+            navigate('/');
         } catch (error) {
             console.error('خطأ أثناء الإرسال:', error);
         }
@@ -135,7 +138,7 @@ export default function Form() {
     };
 
     return (
-        <div className="min-h-screen bg-[#F9F9F9] text-[#15445A] px-4 py-8 text-lg" dir="rtl">
+        <div className="min-h-screen bg-[#15445A] text-[#15445A] px-4 py-8 text-lg" dir="rtl">
             <div className="max-w-[82%] mx-auto">
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* صندوق عنوان المشروع */}
@@ -251,7 +254,7 @@ export default function Form() {
                         <div className="grid grid-cols-3 border-t border-[#C2C1C1]">
                             <div className="bg-[#0DA9A6] p-4 text-white font-semibold text-center border-l border-[#C2C1C1]">البريد الإلكتروني</div>
                             <div className="bg-[#0DA9A6] p-4 text-white font-semibold text-center border-l border-[#C2C1C1]">الجوال</div>
-                            <div className="bg-[#0DA9A6] p-4 text-white font-semibold text-center">الهاتف الشبكي</div>
+                            <div className="bg-[#0DA9A6] p-4 text-white font-semibold text-center">الهاتف الشبكي )اختياري(</div>
                         </div>
 
                         <div className="grid grid-cols-3 border-t border-[#C2C1C1]">
@@ -262,19 +265,21 @@ export default function Form() {
                                     value={formData.email}
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-2 border border-[#C2C1C1] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0DA9A6] text-[#15445A]"
-                                    placeholder="example@domain.com"
+                                    placeholder="example@gmail.com"
                                     required
                                 />
                             </div>
                             <div className="p-4 border-l border-[#C2C1C1]">
-                                <input
-                                    type="tel"
-                                    name="phone"
+                                <PhoneInput
+                                    country={'sa'} // يبدأ من السعودية
                                     value={formData.phone}
-                                    onChange={handleInputChange}
-                                    className="w-full px-4 py-2 border border-[#C2C1C1] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0DA9A6] text-[#15445A]"
-                                    placeholder="05xxxxxxxx"
-                                    required
+                                    onChange={(phone) => setFormData({ ...formData, phone })}
+                                    inputClass="!w-full !px-4 !py-2 !border !border-[#C2C1C1] !rounded-md !focus:outline-none !focus:ring-2 !focus:ring-[#0DA9A6] !text-[#15445A]"
+                                    containerClass="text-right"
+                                    buttonClass=""
+                                    enableSearch
+                                    localization={ar}
+                                    placeholder="رقم الهاتف"
                                 />
                             </div>
                             <div className="p-4">
@@ -283,9 +288,9 @@ export default function Form() {
                                     name="networkPhone"
                                     value={formData.networkPhone}
                                     onChange={handleInputChange}
-                                    className="w-full px-4 py-2 border border-[#C2C1C1] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0DA9A6] text-[#15445A]"
+                                    className="w-full px-4 py-2 border text-right border-[#C2C1C1] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0DA9A6] text-[#15445A]"
                                     placeholder="الهاتف الشبكي"
-                                    required
+
                                 />
                             </div>
                         </div>
@@ -560,7 +565,7 @@ export default function Form() {
                             <div className="grid grid-cols-3 border-b border-[#C2C1C1]">
                                 <div className="bg-[#0DA9A6] p-4 border-l border-[#C2C1C1] text-center font-semibold text-white">الاسم</div>
                                 <div className="bg-[#0DA9A6] p-4 border-l border-[#C2C1C1] text-center font-semibold text-white">التاريخ</div>
-                                <div className="bg-[#0DA9A6] p-4 text-center font-semibold text-white">التوقيع</div>
+                                <div className="bg-[#0DA9A6] p-4 text-center font-semibold text-white"> التوقيع )اختياري(</div>
                             </div>
                             <div className="grid grid-cols-3">
                                 <div className="p-4 border-l border-[#C2C1C1]">
@@ -592,6 +597,7 @@ export default function Form() {
                                         onChange={handleInputChange}
                                         className="w-full px-4 py-2 border border-[#C2C1C1] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0DA9A6] text-[#15445A]"
                                         placeholder="التوقيع"
+
                                     />
                                 </div>
                             </div>

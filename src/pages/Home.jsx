@@ -32,20 +32,24 @@ export default function Home() {
 
   return (
     <div
-      className="min-h-screen pt-6 bg-[#F3F7FA] text-[#15445A] text-lg"
+      className="min-h-screen pt-6  bg-gradient-to-r from-[#3D7EB9] via-[#0DA9A6] to-[#07A869]  text-white text-lg"
       dir="rtl"
       style={{ fontFamily: "'Helvetica Neue', 'Sakkal Majalla'" }}
     >
       {/* Header */}
       <header className="p-4 text-center">
-        <h1 className="text-5xl md:text-6xl font-bold">مرحباً بك</h1>
+        <h1 className="text-6xl md:text-6xl font-bold">مرحباً بك
+          <br />
+          نموذج اعتماد مشروع/برنامج
+        </h1>
       </header>
 
       <main className="max-w-6xl mx-auto px-6 space-y-10">
+
         {isLoggedIn && (
           <>
             {/* User Info Card */}
-            <div className="bg-white border border-[#C2C1C1] rounded-xl p-8 shadow text-xl">
+            <div className=" border border-[#C2C1C1] rounded-xl p-8 shadow text-xl">
               <div className="flex items-center space-x-8 space-x-reverse">
                 <img
                   src={user?.profileImage || 'https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png'}
@@ -54,8 +58,8 @@ export default function Home() {
                 />
                 <div className="flex-1 space-y-3 mx-4">
                   <h2 className="text-3xl font-bold">{user?.userName}</h2>
-                  <p className="text-lg text-gray-700">{user?.email}</p>
-                  <p className="text-lg text-gray-500">
+                  <p className="text-lg">{user?.email}</p>
+                  <p className="text-lg">
                     التاريخ: {new Date().toLocaleDateString('ar-EG')}
                   </p>
                 </div>
@@ -68,7 +72,7 @@ export default function Home() {
 
                 <button
                   onClick={() => navigate('/admin')}
-                  className="mx-5 bg-gradient-to-r from-[#3D7EB9] via-[#0DA9A6] to-[#07A869] text-white px-5 py-5 rounded-xl text-2xl shadow hover:opacity-90 transition-all cursor-pointer flex items-center justify-center gap-3"
+                  className="mx-5 bg-[#15445A] text-white px-10 py-5 rounded-xl text-2xl shadow hover:hover:bg-[#1544AB] transition-all cursor-pointer flex items-center justify-center gap-3"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 -960 960 960" width="28px" fill="#e3e3e3">
                     <path d="m370-80-16-128q-13-5-24.5-12T307-235l-119 50L78-375l103-78q-1-7-1-13.5v-27q0-6.5 1-13.5L78-585l110-190 119 50q11-8 23-15t24-12l16-128h220l16 128q13 5 24.5 12t22.5 15l119-50 110 190-103 78q1 7 1 13.5v27q0 6.5-2 13.5l103 78-110 190-118-50q-11 8-23 15t-24 12L590-80H370Zm70-80h79l14-106q31-8 57.5-23.5T639-327l99 41 39-68-86-65q5-14 7-29.5t2-31.5q0-16-2-31.5t-7-29.5l86-65-39-68-99 42q-22-23-48.5-38.5T533-694l-13-106h-79l-14 106q-31 8-57.5 23.5T321-633l-99-41-39 68 86 64q-5 15-7 30t-2 32q0 16 2 31t7 30l-86 65 39 68 99-42q22 23 48.5 38.5T427-266l13 106Zm42-180q58 0 99-41t41-99q0-58-41-99t-99-41q-59 0-99.5 41T342-480q0 58 40.5 99t99.5 41Zm-2-140Z" />
@@ -77,9 +81,9 @@ export default function Home() {
                 </button>
               )}
 
-              <button
+              {/* <button
                 onClick={() => navigate('/form', { state: { mode: 'create' } })}
-                className="bg-[#07A869] text-white px-10 py-5 mx-5 rounded-xl text-2xl shadow hover:bg-[#05975f] transition-all cursor-pointer"
+                className="bg-[#15445A] text-white px-10 py-5 mx-5 rounded-xl text-2xl shadow hover:bg-[rgb(45,49,81)] transition-all cursor-pointer"
               >
                 <span className="inline-block align-middle ml-2 text-2xl">
                   <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" fill="currentColor" viewBox="0 0 24 24">
@@ -87,7 +91,7 @@ export default function Home() {
                   </svg>
                 </span>
                 إضافة نموذج جديد
-              </button>
+              </button> */}
             </div>
 
             {/* Forms Table */}
@@ -148,25 +152,37 @@ export default function Home() {
         )}
 
         {!isLoggedIn && (
-          <div className="text-center py-24 space-y-6">
-            <button
-              onClick={() => navigate('/form', { state: { mode: 'create' } })}
-              className="bg-[#0DA9A6] text-white px-10 py-5 mx-4 rounded-xl cursor-pointer text-2xl shadow hover:bg-[#07A869] transition-all"
-            >
-              <span className="inline-block align-middle ml-2 text-2xl">
-                <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 5v14m7-7H5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                </svg>
-              </span>
-              إضافة نموذج جديد
-            </button>
-            <button
-              onClick={() => navigate('/login')}
-              className="bg-[#3D7EB9] text-white px-10 py-5 mx-5 rounded-xl cursor-pointer text-2xl shadow hover:bg-[#336fa3] transition-all"
-            >
-              تسجيل الدخول الآن
-            </button>
-          </div>
+          <>
+            <div className="text-center py-24 space-y-6">
+              <div className="inline-flex flex-col items-center">
+                <button
+                  onClick={() => navigate('/form', { state: { mode: 'create' } })}
+                  className="bg-[#15445A] text-[#C1B48A] px-10 py-5   cursor-pointer text-4xl shadow hover:bg-[#1544AB] transition-all"
+                >
+                  <span className="inline-block align-middle ml-2 text-2xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 5v14m7-7H5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                    </svg>
+                  </span>
+                  إضافة نموذج جديد
+                </button>
+
+                {/* الخط السفلي */}
+                <span className="block h-[6px] w-full bg-gradient-to-r to-[#07A869] via-[#0DA9A6] from-[#3D7EB9]  "></span>
+              </div>
+            </div>
+
+
+            <div className="fixed bottom-4 right-4 text-right">
+              <button
+                onClick={() => navigate('/login')}
+                className="bg-[#3D7EB9] text-white px-4 py-2 rounded text-sm shadow hover:bg-[#336fa3] transition-all cursor-pointer"
+              >
+                تسجيل دخول المسؤول
+              </button>
+              <p className="text-lg text-gray-200 mt-1">)خاص بمسؤول الموقع (</p>
+            </div>
+          </>
         )}
       </main>
     </div>

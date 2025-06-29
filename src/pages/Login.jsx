@@ -77,7 +77,7 @@ export default function Login() {
 
 
   return (
-    <div className="min-h-screen bg-[#F9F9F9] py-8 text-[#15445A] px-4" dir="rtl">
+    <div className="min-h-screen  bg-gradient-to-r from-[#3D7EB9] via-[#0DA9A6] to-[#07A869] py-8 text-[#15445A] px-4" dir="rtl">
       <div className="w-full max-w-md sm:max-w-lg md:max-w-lg lg:max-w-lg xl:max-w-lg mx-auto">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-[#C2C1C1]">
           <div className="bg-[#15445A] p-4 text-center">
@@ -140,7 +140,7 @@ export default function Login() {
               {isLoading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
             </button>
 
-            {/* رابط إنشاء حساب */}
+            {/* رابط إنشاء حساب
             <div className="text-center mt-4">
               <p className="text-[#15445A]">
                 ليس لديك حساب؟{' '}
@@ -148,7 +148,7 @@ export default function Login() {
                   إنشاء حساب جديد
                 </Link>
               </p>
-            </div>
+            </div> */}
           </form>
         </div>
       </div>

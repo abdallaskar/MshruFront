@@ -275,7 +275,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F9F9F9] flex text-xl" dir="rtl">
+    <div className="min-h-screen bg-[#C2C1C1] flex text-xl" dir="rtl">
       <div className="w-64 bg-[#15445A] text-white flex flex-col">
         <div className="p-6 border-b border-[#0DA9A6]">
           <h1 className="text-2xl font-bold">لوحة تحكم المشرف</h1>
