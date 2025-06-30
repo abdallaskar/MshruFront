@@ -42,3 +42,12 @@
 body {
     font-family: 'Helvetica Neue', 'Sakkal Majalla', Arial, sans-serif;
 }
+
+.custom-toast {
+    font-size: 40px;
+    /* حجم الخط */
+    text-align: center;
+    /* محاذاة النص للمنتصف داخل التوست */
+    padding: 20px;
+    /* مسافة داخلية أكبر */
+}
