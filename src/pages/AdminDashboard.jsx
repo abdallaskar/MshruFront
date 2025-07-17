@@ -1,26 +1,83 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import axiosInstance from '../api/axios';
-import { BarChart3, Users, FileText, TrendingUp, Eye, Edit, Download, Calendar, Activity } from 'lucide-react';
+import { BarChart3, Users, FileText, TrendingUp, Eye, Edit, Download, Settings, Activity } from 'lucide-react';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import FormPDF from '../components/FormPDF';
 
 export default function AdminDashboard() {
+
+
   const navigate = useNavigate();
 
-  const [users, setUsers] = useState([]);
-  const [forms, setForms] = useState([]);
+  // Tabs state
   const [activeTab, setActiveTab] = useState('statistics');
 
+  // Users and Forms
+  const [users, setUsers] = useState([]);
+  const [forms, setForms] = useState([]);
+
+  // Fields Configuration
+  const [fields, setFields] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  // Counters
+  const totalUsers = users.length;
+  const totalForms = forms.length;
+  const adminUsers = users.filter(user => user.role === 'admin' || user.role === 'مشرف').length;
+  const regularUsers = users.filter(user => user.role === 'user' || user.role === 'مستخدم').length;
+
+  // ✅ Fetch Field Configuration
+  const fetchFields = async () => {
+    try {
+      setLoading(true);
+      const res = await axiosInstance.get('/config');
+      setFields(res.data.fields || []);
+    } catch (error) {
+      console.error("Error fetching fields:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAllFieldsUpdate = async () => {
+    try {
+      await axiosInstance.put(`/config/`, { fields });
+      alert('تم حفظ جميع التعديلات بنجاح');
+      fetchFields();
+    } catch (error) {
+      console.error("Error updating fields:", error);
+      alert('حدث خطأ أثناء حفظ التعديلات');
+    }
+  };
+  const handleResetFields = async () => {
+    try {
+      await axiosInstance.post(`/config/reset`);
+      alert('تم إعادة الحقول إلى الإعدادات الافتراضية');
+      fetchFields();
+    } catch (error) {
+      console.error("Error resetting fields:", error);
+      alert('حدث خطأ أثناء إعادة الحقول');
+    }
+  }
+
+  // ✅ Load fields only when 'fields' tab is active
+  useEffect(() => {
+    if (activeTab === 'fields') fetchFields();
+  }, [activeTab]);
+
+  // ✅ Load Users & Forms on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const usersRes = await axiosInstance.get('/users');
-        const formsRes = await axiosInstance.get('/form/all');
+        const [usersRes, formsRes] = await Promise.all([
+          axiosInstance.get('/users'),
+          axiosInstance.get('/form/all')
+        ]);
         setUsers(usersRes.data);
         setForms(formsRes.data);
-      } catch (err) {
-        console.error('Error loading admin data:', err);
+      } catch (error) {
+        console.error('Error loading admin data:', error);
       }
     };
     fetchData();
@@ -28,6 +85,19 @@ export default function AdminDashboard() {
 
   const handleEditForm = (form) => {
     navigate('/form', { state: { mode: 'edit', data: form } });
+  };
+
+  const handleWordExport = async (form) => {
+    const res = await axiosInstance.get(`/export/word?formId=${form._id}`, {
+      responseType: 'blob',
+    });
+    const url = window.URL.createObjectURL(new Blob([res.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `${form.projectName}.docx`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
   };
 
   const handleExport = async () => {
@@ -47,11 +117,6 @@ export default function AdminDashboard() {
       console.error('Error downloading Excel file:', error);
     }
   };
-
-  const totalUsers = users.length;
-  const totalForms = forms.length;
-  const adminUsers = users.filter(user => user.role === 'admin' || user.role === 'مشرف').length;
-  const regularUsers = users.filter(user => user.role === 'user' || user.role === 'مستخدم').length;
 
   const StatCard = ({ title, value, icon: Icon, color }) => (
     <div className="bg-white rounded-lg shadow-md p-6 border border-[#C2C1C1]">
@@ -150,15 +215,18 @@ export default function AdminDashboard() {
     </div>
   );
 
+
   const renderForms = () => (
     <div className="space-y-6">
       <h2 className="text-3xl font-bold text-[#15445A] mb-6">جميع النماذج</h2>
+
       <button
         onClick={handleExport}
         className="px-4 py-2 bg-[#07A869] text-white rounded-lg hover:bg-green-700 cursor-pointer"
       >
         تصدير كل النماذج Excel
       </button>
+
       <div className="bg-white rounded-lg shadow-md border border-[#C2C1C1] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full text-right">
@@ -166,11 +234,11 @@ export default function AdminDashboard() {
               <tr>
                 <th className="p-3 border-l border-[#C2C1C1]">اسم المشروع</th>
                 <th className="p-3 border-l border-[#C2C1C1]">الهدف الرئيسي</th>
-                <th className="p-3 border-l border-[#C2C1C1]">الفئة المستهدفة</th>
                 <th className="p-3 border-l border-[#C2C1C1]">الإدارة المالكة</th>
                 <th className="p-3 border-l border-[#C2C1C1]">البريد الإلكتروني</th>
                 <th className="p-3 border-l border-[#C2C1C1]">تعديل</th>
-                <th className="p-3 border-l border-[#C2C1C1]">تصدير</th>
+                <th className="p-3 border-l border-[#C2C1C1]">PDF</th>
+                <th className="p-3 border-l border-[#C2C1C1]">Word</th>
               </tr>
             </thead>
             <tbody>
@@ -181,7 +249,6 @@ export default function AdminDashboard() {
                 >
                   <td className="p-3 border-l border-[#C2C1C1]">{form.projectName}</td>
                   <td className="p-3 border-l border-[#C2C1C1]">{form.strategicObjective}</td>
-                  <td className="p-3 border-l border-[#C2C1C1]">{form.targetGroup}</td>
                   <td className="p-3 border-l border-[#C2C1C1]">{form.ownerName}</td>
                   <td className="p-3 border-l border-[#C2C1C1]">{form.email}</td>
                   <td className="p-3 border-l border-[#C2C1C1]">
@@ -209,6 +276,15 @@ export default function AdminDashboard() {
                       }
                     </PDFDownloadLink>
                   </td>
+                  <td className="p-3 border-l border-[#C2C1C1]">
+                    <button
+                      onClick={() => handleWordExport(form)}
+                      className="bg-[#3D7EB9] hover:bg-[#336FA3] text-white px-3 py-1 rounded inline-flex items-center gap-1 transition-colors cursor-pointer"
+                    >
+                      <Download className="w-4 h-4" />
+                      Word
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -216,7 +292,6 @@ export default function AdminDashboard() {
         </div>
       </div>
     </div>
-
   );
 
   const renderUsers = () => (
@@ -261,6 +336,83 @@ export default function AdminDashboard() {
     </div>
   );
 
+  const renderFieldSettings = () => (
+    <div className="space-y-6">
+      <h2 className="text-xl font-bold text-[#15445A] mb-4">إعدادات الحقول</h2>
+
+      {loading ? (
+        <p className="text-[#15445A]">جاري التحميل...</p>
+      ) : (
+        <div className="space-y-4">
+          {fields.map((field, index) => (
+            <div key={index} className="p-3 font-bold  bg-white rounded shadow border border-[#0DA9A6] space-y-3 text-[#15445A] text-sm">
+              <div className="flex flex-col md:flex-row gap-4">
+                {/* Label Input */}
+                <div className="flex-1 space-y-1">
+                  <label className="font-semibold">العنوان:</label>
+                  <input
+                    value={field.label}
+                    onChange={(e) =>
+                      setFields((prev) =>
+                        prev.map((f, i) => i === index ? { ...f, label: e.target.value } : f)
+                      )
+                    }
+                    className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-[#0DA9A6]"
+                  />
+                </div>
+
+                {/* Placeholder Input */}
+                <div className="flex-1 space-y-1">
+                  <label className="font-semibold">نص Placeholder:</label>
+                  <input
+                    value={field.placeholder}
+                    onChange={(e) =>
+                      setFields((prev) =>
+                        prev.map((f, i) => i === index ? { ...f, placeholder: e.target.value } : f)
+                      )
+                    }
+                    className="w-full p-2 border rounded focus:outline-none focus:ring focus:ring-[#0DA9A6]"
+                  />
+                </div>
+              </div>
+
+              {/* Required Checkbox */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={field.isRequired}
+                  onChange={(e) =>
+                    setFields((prev) =>
+                      prev.map((f, i) => i === index ? { ...f, isRequired: e.target.checked } : f)
+                    )
+                  }
+                />
+                <label className="font-medium">حقل إجباري؟</label>
+              </div>
+            </div>
+          ))}
+
+          {/* Save All Button */}
+          <div className="flex flex-col md:flex-row justify-center items-center gap-4 mt-6">
+            <button
+              onClick={handleAllFieldsUpdate}
+              className="w-72 py-3 bg-[#0DA9A6] cursor-pointer text-white rounded-lg text-lg font-bold hover:bg-[#0c8b89] transition-all"
+            >
+              حفظ جميع التعديلات
+            </button>
+            <button
+              onClick={handleResetFields}
+              className="w-72 py-3 bg-[#15445A] cursor-pointer text-white rounded-lg text-lg font-bold hover:bg-[#133d52] transition-all"
+            >
+              إعادة الحقول إلى الإعدادات الافتراضية
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+
   const renderContent = () => {
     switch (activeTab) {
       case 'statistics':
@@ -269,6 +421,8 @@ export default function AdminDashboard() {
         return renderForms();
       case 'users':
         return renderUsers();
+      case 'fields':
+        return renderFieldSettings();
       default:
         return renderStatistics();
     }
@@ -310,6 +464,14 @@ export default function AdminDashboard() {
           >
             <Users className="w-5 h-5" />
             المستخدمين
+          </button>
+          <button
+            onClick={() => setActiveTab('fields')}
+            className={`w-full flex items-center gap-3 px-4 py-3 cursor-pointer rounded-lg text-right transition-colors ${activeTab === 'fields' ? 'bg-[#0DA9A6] text-white' : 'text-gray-300 hover:bg-[#133d52] hover:text-white'
+              }`}
+          >
+            <Settings className="w-5 h-5" />
+            إعدادات الحقول
           </button>
         </nav>
       </div>

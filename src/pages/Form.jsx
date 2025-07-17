@@ -40,6 +40,23 @@ export default function Form() {
         authorityDate: '',
         authoritySignature: ''
     });
+    const [formFields, setFormFields] = useState([]);
+    useEffect(() => {
+        const fetchFormFields = async () => {
+            const res = await axiosInstance.get('/config');
+            const fieldsArray = res.data.fields || [];
+
+            // نحول ال array لـ object => { projectName: {label, placeholder}, ... }
+            const fieldsObject = fieldsArray.reduce((acc, field) => {
+                acc[field.fieldKey] = field;
+                return acc;
+            }, {});
+            setFormFields(fieldsObject);
+        };
+        fetchFormFields();
+    }, []);
+
+    // console.log('formFields', formFields);
 
     const [errors, setErrors] = useState({});
     const { mode, data } = location.state || {};
@@ -91,45 +108,35 @@ export default function Form() {
         e.preventDefault();
 
         const newErrors = {};
-        // ✅ التحقق من الحقول النصية الأساسية
-        const requiredFields = [
-            'projectName', 'ownerName', 'strategicObjective', 'performanceIndicator',
-            'previousReading', 'targetReading', 'email', 'phone',
-            'mainProjectObjective', 'startDate', 'endDate', 'detailedProjectDescription',
-            'supportingManagement', 'supportingAgency', 'targetGroup',
-            'firstIndicator', 'secondIndicator', 'thirdIndicator',
-            'potentialChallenges', 'uniqueProcedures', 'projectBudget',
-            'authorityName', 'authorityDate',
-        ];
 
-        requiredFields.forEach(field => {
-            if (!formData[field] || !formData[field].trim()) {
-                newErrors[field] = 'هذا الحقل مطلوب';
+        // ✅ التحقق من الحقول النصية بناءً على formFields
+        // console.log('formFields:', formFields);
+        Object.values(formFields).forEach(({ fieldKey, isRequired }) => {
+            if (isRequired && (!formData[fieldKey] || !formData[fieldKey].trim())) {
+                newErrors[fieldKey] = 'هذا الحقل مطلوب';
             }
         });
 
-        // ✅ تحقق من بيانات الفريق
-        formData.teamMembers.forEach((member, index) => {
-            if (!member.name.trim()) {
-                newErrors[`teamMember_${index}_name`] = 'الاسم مطلوب';
-            }
-            if (!member.position.trim()) {
-                newErrors[`teamMember_${index}_position`] = 'الوظيفة مطلوبة';
-            }
-            if (!member.workType.trim()) {
-                newErrors[`teamMember_${index}_workType`] = 'جهة العمل مطلوبة';
-            }
-        });
-
-        // لو في أخطاء أوقف وأعرض الأخطاء
-        if (Object.keys(newErrors).length > 0) {
-            setErrors(newErrors);
-            toast.error('يرجى تعبئة جميع الحقول المطلوبة', {
-                position: "top-center",
+        // ✅ التحقق من بيانات الفريق
+        if (Array.isArray(formData.teamMembers)) {
+            formData.teamMembers.forEach((member, index) => {
+                if (!member.name.trim()) {
+                    newErrors[`teamMember_${index}_name`] = 'هذا الحقل مطلوب';
+                }
+                if (!member.position.trim()) {
+                    newErrors[`teamMember_${index}_position`] = 'هذا الحقل مطلوب';
+                }
+                if (!member.workType.trim()) {
+                    newErrors[`teamMember_${index}_workType`] = 'هذا الحقل مطلوب';
+                }
             });
-            return;
         }
 
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            toast.error('يرجى تعبئة جميع الحقول المطلوبة', { position: "top-center" });
+            return;
+        }
         setLoading(true);
 
         try {
@@ -206,7 +213,7 @@ export default function Form() {
                                 {/* Project Name */}
                                 <div className="p-2 md:p-4">
                                     <label className="block mb-2 text-white font-semibold bg-[#0DA9A6] p-2 text-center md:text-right rounded">
-                                        اسم المشروع / البرنامج
+                                        {formFields.projectName?.label || 'اسم المشروع'}
                                     </label>
                                     <input
                                         type="text"
@@ -214,7 +221,7 @@ export default function Form() {
                                         value={formData.projectName}
                                         onChange={handleInputChange}
                                         className={`w-full px-2 md:px-4 py-2 border rounded-md focus:outline-none focus:ring-2 text-[#15445A] ${errors.projectName ? 'border-red-500 shadow-md shadow-red-300' : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'}`}
-                                        placeholder="أدخل اسم المشروع / البرنامج"
+                                        placeholder={formFields.projectName?.placeholder || 'اسم المشروع'}
                                     />
                                     {errors.projectName && (
                                         <p className="text-red-500 text-sm mt-1">{errors.projectName}</p>
@@ -224,7 +231,7 @@ export default function Form() {
                                 {/* Owner Name */}
                                 <div className="p-2 md:p-4">
                                     <label className="block mb-2 text-white font-semibold bg-[#0DA9A6] p-2 text-center md:text-right rounded">
-                                        مالك المشروع ) إدارة / قسم (
+                                        {formFields.ownerName?.label || 'مالك المشروع ) إدارة / قسم ('}
                                     </label>
                                     <input
                                         type="text"
@@ -232,7 +239,7 @@ export default function Form() {
                                         value={formData.ownerName}
                                         onChange={handleInputChange}
                                         className={`w-full px-2 md:px-4 py-2 border rounded-md focus:outline-none focus:ring-2 text-[#15445A] ${errors.ownerName ? 'border-red-500 shadow-md shadow-red-300' : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'}`}
-                                        placeholder="اسم الإدارة المالكة"
+                                        placeholder={formFields.ownerName?.placeholder || 'اسم الإدارة المالكة'}
                                     />
                                     {errors.ownerName && (
                                         <p className="text-red-500 text-sm mt-1">{errors.ownerName}</p>
@@ -245,7 +252,7 @@ export default function Form() {
                                 {/* الهدف الاستراتيجي */}
                                 <div className="p-2 md:p-4">
                                     <label className="block mb-2 text-white font-semibold bg-[#0DA9A6] p-2 text-center md:text-right rounded">
-                                        الهدف الاستراتيجي
+                                        {formFields.strategicObjective?.label || 'الهدف الاستراتيجي'}
                                     </label>
                                     <input
                                         type="text"
@@ -256,7 +263,7 @@ export default function Form() {
                                             ? 'border-red-500 shadow-md shadow-red-300'
                                             : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'
                                             }`}
-                                        placeholder="أدخل الهدف الاستراتيجي"
+                                        placeholder={formFields.strategicObjective?.placeholder || 'أدخل الهدف الاستراتيجي'}
                                     />
                                     {errors.strategicObjective && (
                                         <p className="text-red-500 text-sm mt-1">{errors.strategicObjective}</p>
@@ -266,7 +273,7 @@ export default function Form() {
                                 {/* مؤشر الأداء المستهدف */}
                                 <div className="p-2 md:p-4">
                                     <label className="block mb-2 text-white font-semibold bg-[#0DA9A6] p-2 text-center md:text-right rounded">
-                                        مؤشر الأداء المستهدف
+                                        {formFields.performanceIndicator?.label || 'مؤشر الأداء المستهدف'}
                                     </label>
                                     <input
                                         type="text"
@@ -277,7 +284,7 @@ export default function Form() {
                                             ? 'border-red-500 shadow-md shadow-red-300'
                                             : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'
                                             }`}
-                                        placeholder="أدخل مؤشر الأداء المستهدف"
+                                        placeholder={formFields.performanceIndicator?.placeholder || 'أدخل مؤشر الأداء المستهدف'}
                                     />
                                     {errors.performanceIndicator && (
                                         <p className="text-red-500 text-sm mt-1">{errors.performanceIndicator}</p>
@@ -291,7 +298,7 @@ export default function Form() {
                                 {/* القراءة السابقة للمؤشر */}
                                 <div className="p-2 md:p-4">
                                     <label className="block mb-2 text-white font-semibold bg-[#0DA9A6] p-2 text-center md:text-right rounded">
-                                        القراءة السابقة للمؤشر
+                                        {formFields.previousReading?.label || 'القراءة السابقة للمؤشر'}
                                     </label>
                                     <input
                                         type="text"
@@ -302,7 +309,7 @@ export default function Form() {
                                             ? 'border-red-500 shadow-md shadow-red-300'
                                             : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'
                                             }`}
-                                        placeholder="أدخل القراءة السابقة للمؤشر"
+                                        placeholder={formFields.previousReading?.placeholder || 'أدخل القراءة السابقة للمؤشر'}
                                     />
                                     {errors.previousReading && (
                                         <p className="text-red-500 text-sm mt-1">{errors.previousReading}</p>
@@ -312,7 +319,7 @@ export default function Form() {
                                 {/* القراءة المستهدفة للمؤشر */}
                                 <div className="p-2 md:p-4">
                                     <label className="block mb-2 text-white font-semibold bg-[#0DA9A6] p-2 text-center md:text-right rounded">
-                                        القراءة المستهدفة للمؤشر
+                                        {formFields.targetReading?.label || 'القراءة المستهدفة للمؤشر'}
                                     </label>
                                     <input
                                         type="text"
@@ -323,7 +330,7 @@ export default function Form() {
                                             ? 'border-red-500 shadow-md shadow-red-300'
                                             : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'
                                             }`}
-                                        placeholder="أدخل القراءة المستهدفة للمؤشر"
+                                        placeholder={formFields.targetReading?.placeholder || 'أدخل القراءة المستهدفة للمؤشر'}
                                     />
                                     {errors.targetReading && (
                                         <p className="text-red-500 text-sm mt-1">{errors.targetReading}</p>
@@ -345,7 +352,7 @@ export default function Form() {
                             {/* البريد الإلكتروني */}
                             <div className="p-2 md:p-4 border-b md:border-b-0 md:border-l border-[#C2C1C1]">
                                 <label className="block mb-2 text-white font-semibold bg-[#0DA9A6] p-2 text-center md:text-right rounded">
-                                    البريد الإلكتروني
+                                    {formFields.email?.label || 'البريد الإلكتروني'}
                                 </label>
                                 <input
                                     type="email"
@@ -356,7 +363,7 @@ export default function Form() {
                                         ? 'border-red-500 shadow-md shadow-red-300'
                                         : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'
                                         }`}
-                                    placeholder="example@gmail.com"
+                                    placeholder={formFields.email?.placeholder || 'example@gmail.com'}
                                 />
                                 {errors.email && (
                                     <p className="text-red-500 text-sm mt-1">{errors.email}</p>
@@ -366,7 +373,7 @@ export default function Form() {
                             {/* الجوال */}
                             <div className="p-2 md:p-4 border-b md:border-b-0 md:border-l border-[#C2C1C1]">
                                 <label className="block mb-2 text-white font-semibold bg-[#0DA9A6] p-2 text-center md:text-right rounded">
-                                    الجوال
+                                    {formFields.phone?.label || 'الجوال'}
                                 </label>
                                 <PhoneInput
                                     country={'sa'}
@@ -384,7 +391,7 @@ export default function Form() {
                                     buttonClass=""
                                     enableSearch
                                     localization={ar}
-                                    placeholder="رقم الهاتف"
+                                    placeholder={formFields.phone?.placeholder || 'رقم الهاتف'}
                                 />
                                 {errors.phone && (
                                     <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
@@ -394,7 +401,7 @@ export default function Form() {
                             {/* الهاتف الشبكي */}
                             <div className="p-2 md:p-4">
                                 <label className="block mb-2 text-white font-semibold bg-[#0DA9A6] p-2 text-center md:text-right rounded">
-                                    الهاتف الشبكي ) اختياري (
+                                    {formFields.networkPhone?.label || 'الهاتف الشبكي ) اختياري ('}
                                 </label>
                                 <input
                                     type="tel"
@@ -405,7 +412,7 @@ export default function Form() {
                                         ? 'border-red-500 shadow-md shadow-red-300'
                                         : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'
                                         }`}
-                                    placeholder="الهاتف الشبكي"
+                                    placeholder={formFields.networkPhone?.placeholder || 'الهاتف الشبكي'}
                                 />
                                 {errors.networkPhone && (
                                     <p className="text-red-500 text-sm mt-1">{errors.networkPhone}</p>
@@ -417,7 +424,9 @@ export default function Form() {
 
                         {/* الهدف الرئيسي */}
                         <div className="grid grid-cols-1 md:grid-cols-2 border-t border-[#C2C1C1]">
-                            <div className="bg-[#0DA9A6] p-2 md:p-4 text-white font-semibold text-center border-l border-[#C2C1C1]">الهدف الرئيسي للمشروع / البرنامج</div>
+                            <div className="bg-[#0DA9A6] p-2 md:p-4 text-white font-semibold text-center border-l border-[#C2C1C1]">
+                                {formFields.mainProjectObjective?.label || 'الهدف الرئيسي للمشروع / البرنامج'}
+                            </div>
                             <div className="p-2 md:p-4">
                                 <input
                                     type="text"
@@ -428,7 +437,7 @@ export default function Form() {
                                         ? 'border-red-500 shadow-md shadow-red-300'
                                         : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'
                                         }`}
-                                    placeholder="أدخل الهدف الرئيسي"
+                                    placeholder={formFields.mainProjectObjective?.placeholder || 'أدخل الهدف الرئيسي'}
                                 />
                                 {errors.mainProjectObjective && (
                                     <p className="text-red-500 text-sm mt-1">{errors.mainProjectObjective}</p>
@@ -440,7 +449,7 @@ export default function Form() {
                         {/* فترة التنفيذ */}
                         <div className="grid grid-cols-1 md:grid-cols-2 border-t border-[#C2C1C1]">
                             <div className="bg-[#0DA9A6] p-2 md:p-4 text-white font-semibold text-center border-l border-[#C2C1C1]">
-                                فترة التنفيذ ) من - إلي  (
+                                {formFields.startDate?.label || 'تاريخ البداية'}
                             </div>
                             <div className="p-2 md:p-4 grid grid-cols-1 md:grid-cols-2 gap-2 md:p-4">
                                 {/* تاريخ البداية */}
@@ -485,7 +494,8 @@ export default function Form() {
                         {/* الوصف التفصيلي */}
                         <div className="grid grid-cols-1 md:grid-cols-2 border-t border-[#C2C1C1]">
                             <div className="bg-[#0DA9A6] p-2 md:p-4 text-white font-semibold text-center border-l border-[#C2C1C1]">
-                                الوصف التفصيلي للمشروع / البرنامج<br />يتضمن الأنشطة والمراحل التنفيذية
+                                {formFields.detailedProjectDescription?.label || 'الوصف التفصيلي للمشروع / البرنامج'}
+                                <br />يتضمن الأنشطة والمراحل التنفيذية
                             </div>
                             <div className="p-2 md:p-4">
                                 <textarea
@@ -497,7 +507,7 @@ export default function Form() {
                                         ? 'border-red-500 shadow-md shadow-red-300'
                                         : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'
                                         }`}
-                                    placeholder="أدخل الوصف التفصيلي"
+                                    placeholder={formFields.detailedProjectDescription?.placeholder || 'أدخل الوصف التفصيلي'}
                                 />
                                 {errors.detailedProjectDescription && (
                                     <p className="text-red-500 text-sm mt-1">{errors.detailedProjectDescription}</p>
@@ -511,7 +521,7 @@ export default function Form() {
                             {/* الإدارة المساندة */}
                             <div className="p-2 md:p-4 border-l border-[#C2C1C1]">
                                 <label className="block mb-2 text-white font-semibold bg-[#0DA9A6] p-2 text-center md:text-right rounded">
-                                    الإدارة المساندة
+                                    {formFields.supportingManagement?.label || 'الإدارة المساندة'}
                                 </label>
                                 <input
                                     type="text"
@@ -522,7 +532,7 @@ export default function Form() {
                                         ? 'border-red-500 shadow-md shadow-red-300'
                                         : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'
                                         }`}
-                                    placeholder="الإدارة المساندة"
+                                    placeholder={formFields.supportingManagement?.placeholder || 'الإدارة المساندة'}
                                 />
                                 {errors.supportingManagement && (
                                     <p className="text-red-500 text-sm mt-1">{errors.supportingManagement}</p>
@@ -532,7 +542,7 @@ export default function Form() {
                             {/* الجهة الداعمة */}
                             <div className="p-2 md:p-4 border-l border-[#C2C1C1]">
                                 <label className="block mb-2 text-white font-semibold bg-[#0DA9A6] p-2 text-center md:text-right rounded">
-                                    الجهة الداعمة
+                                    {formFields.supportingAgency?.label || 'الجهة الداعمة'}
                                 </label>
                                 <input
                                     type="text"
@@ -543,7 +553,7 @@ export default function Form() {
                                         ? 'border-red-500 shadow-md shadow-red-300'
                                         : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'
                                         }`}
-                                    placeholder="الجهة الداعمة"
+                                    placeholder={formFields.supportingAgency?.placeholder || 'الجهة الداعمة'}
                                 />
                                 {errors.supportingAgency && (
                                     <p className="text-red-500 text-sm mt-1">{errors.supportingAgency}</p>
@@ -553,7 +563,7 @@ export default function Form() {
                             {/* الفئة المستهدفة */}
                             <div className="p-2 md:p-4">
                                 <label className="block mb-2 text-white font-semibold bg-[#0DA9A6] p-2 text-center md:text-right rounded">
-                                    الفئة المستهدفة
+                                    {formFields.targetGroup?.label || 'الفئة المستهدفة'}
                                 </label>
                                 <input
                                     type="text"
@@ -564,7 +574,7 @@ export default function Form() {
                                         ? 'border-red-500 shadow-md shadow-red-300'
                                         : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'
                                         }`}
-                                    placeholder="الفئة المستهدفة"
+                                    placeholder={formFields.targetGroup?.placeholder || 'الفئة المستهدفة'}
                                 />
                                 {errors.targetGroup && (
                                     <p className="text-red-500 text-sm mt-1">{errors.targetGroup}</p>
@@ -590,14 +600,16 @@ export default function Form() {
                                         <div className="font-semibold text-[#0DA9A6]">العضو رقم: {index + 1}</div>
 
                                         <div>
-                                            <label className="block text-[#15445A] font-semibold">الاسم</label>
+                                            <label className="block text-[#15445A] font-semibold">
+                                                {formFields.teamMember_name?.label || 'الاسم'}
+                                            </label>
                                             <input
                                                 type="text"
                                                 value={member.name}
                                                 onChange={(e) => updateTeamMember(index, 'name', e.target.value)}
                                                 className={`w-full px-2 py-2 border rounded-md focus:outline-none focus:ring-2 text-[#15445A] ${errors[`teamMember_${index}_name`] ? 'border-red-500 shadow-md shadow-red-300' : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'
                                                     }`}
-                                                placeholder="اسم العضو"
+                                                placeholder={formFields.teamMember_name?.placeholder || 'اسم العضو'}
                                             />
                                             {errors[`teamMember_${index}_name`] && (
                                                 <p className="text-red-500 text-sm mt-1">{errors[`teamMember_${index}_name`]}</p>
@@ -605,14 +617,16 @@ export default function Form() {
                                         </div>
 
                                         <div>
-                                            <label className="block text-[#15445A] font-semibold">الوظيفة</label>
+                                            <label className="block text-[#15445A] font-semibold">
+                                                {formFields.teamMember_position?.label || 'الوظيفة'}
+                                            </label>
                                             <input
                                                 type="text"
                                                 value={member.position}
                                                 onChange={(e) => updateTeamMember(index, 'position', e.target.value)}
                                                 className={`w-full px-2 py-2 border rounded-md focus:outline-none focus:ring-2 text-[#15445A] ${errors[`teamMember_${index}_position`] ? 'border-red-500 shadow-md shadow-red-300' : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'
                                                     }`}
-                                                placeholder="الوظيفة"
+                                                placeholder={formFields.teamMember_position?.placeholder || 'الوظيفة'}
                                             />
                                             {errors[`teamMember_${index}_position`] && (
                                                 <p className="text-red-500 text-sm mt-1">{errors[`teamMember_${index}_position`]}</p>
@@ -620,14 +634,16 @@ export default function Form() {
                                         </div>
 
                                         <div>
-                                            <label className="block text-[#15445A] font-semibold">جهة العمل</label>
+                                            <label className="block text-[#15445A] font-semibold">
+                                                {formFields.teamMember_workType?.label || 'جهة العمل'}
+                                            </label>
                                             <input
                                                 type="text"
                                                 value={member.workType}
                                                 onChange={(e) => updateTeamMember(index, 'workType', e.target.value)}
                                                 className={`w-full px-2 py-2 border rounded-md focus:outline-none focus:ring-2 text-[#15445A] ${errors[`teamMember_${index}_workType`] ? 'border-red-500 shadow-md shadow-red-300' : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'
                                                     }`}
-                                                placeholder="جهة العمل"
+                                                placeholder={formFields.teamMember_workType?.placeholder || 'جهة العمل'}
                                             />
                                             {errors[`teamMember_${index}_workType`] && (
                                                 <p className="text-red-500 text-sm mt-1">{errors[`teamMember_${index}_workType`]}</p>
@@ -671,7 +687,7 @@ export default function Form() {
                                                         onChange={(e) => updateTeamMember(index, 'name', e.target.value)}
                                                         className={`w-full px-2 md:px-4 py-2 border rounded-md focus:outline-none focus:ring-2 text-[#15445A] ${errors[`teamMember_${index}_name`] ? 'border-red-500 shadow-md shadow-red-300' : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'
                                                             }`}
-                                                        placeholder="اسم العضو"
+                                                        placeholder={formFields.teamMember_name?.placeholder || 'اسم العضو'}
                                                     />
                                                 </td>
                                                 <td className="px-2 md:px-4 py-3 border-l border-[#C2C1C1]">
@@ -681,7 +697,7 @@ export default function Form() {
                                                         onChange={(e) => updateTeamMember(index, 'position', e.target.value)}
                                                         className={`w-full px-2 md:px-4 py-2 border rounded-md focus:outline-none focus:ring-2 text-[#15445A] ${errors[`teamMember_${index}_position`] ? 'border-red-500 shadow-md shadow-red-300' : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'
                                                             }`}
-                                                        placeholder="الوظيفة"
+                                                        placeholder={formFields.teamMember_position?.placeholder || 'الوظيفة'}
                                                     />
                                                 </td>
                                                 <td className="px-2 md:px-4 py-3 border-l border-[#C2C1C1]">
@@ -691,7 +707,7 @@ export default function Form() {
                                                         onChange={(e) => updateTeamMember(index, 'workType', e.target.value)}
                                                         className={`w-full px-2 md:px-4 py-2 border rounded-md focus:outline-none focus:ring-2 text-[#15445A] ${errors[`teamMember_${index}_workType`] ? 'border-red-500 shadow-md shadow-red-300' : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'
                                                             }`}
-                                                        placeholder="جهة العمل"
+                                                        placeholder={formFields.teamMember_workType?.placeholder || 'جهة العمل'}
                                                     />
                                                 </td>
                                                 <td className="px-2 md:px-4 py-3 text-center">
@@ -735,7 +751,7 @@ export default function Form() {
                             {/* Challenges Row */}
                             <div className="grid grid-cols-1 md:grid-cols-2 border-b border-[#C2C1C1]">
                                 <div className="bg-[#0DA9A6] p-2 md:p-4 border-l border-[#C2C1C1] text-center font-semibold text-white">
-                                    المؤشر الأول
+                                    {formFields.firstIndicator?.label || 'المؤشر الأول'}
                                 </div>
                                 <div className="p-2 md:p-4">
                                     <input
@@ -747,7 +763,7 @@ export default function Form() {
                                             ? 'border-red-500 shadow-md shadow-red-300'
                                             : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'
                                             }`}
-                                        placeholder="اذكر المؤشر الأول"
+                                        placeholder={formFields.firstIndicator?.placeholder || 'اذكر المؤشر الأول'}
 
                                     />
                                     {errors.firstIndicator && (
@@ -759,7 +775,7 @@ export default function Form() {
                             {/* secondIndicator */}
                             <div className="grid grid-cols-1 md:grid-cols-2 border-b border-[#C2C1C1]">
                                 <div className="bg-[#0DA9A6] p-2 md:p-4 border-l border-[#C2C1C1] text-center font-semibold text-white">
-                                    المؤشر الثاني
+                                    {formFields.secondIndicator?.label || 'المؤشر الثاني'}
                                 </div>
                                 <div className="p-2 md:p-4">
                                     <input
@@ -771,7 +787,7 @@ export default function Form() {
                                             ? 'border-red-500 shadow-md shadow-red-300'
                                             : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'
                                             }`}
-                                        placeholder="اذكر المؤشر الثاني "
+                                        placeholder={formFields.secondIndicator?.placeholder || 'اذكر المؤشر الثاني '}
 
                                     />
                                     {errors.secondIndicator && (
@@ -783,7 +799,7 @@ export default function Form() {
                             {/* third indicator*/}
                             <div className="grid grid-cols-1 md:grid-cols-2">
                                 <div className="bg-[#0DA9A6] p-2 md:p-4 border-l border-[#C2C1C1] text-center font-semibold text-white">
-                                    الثالث المؤشر
+                                    {formFields.thirdIndicator?.label || 'الثالث المؤشر'}
                                 </div>
                                 <div className="p-2 md:p-4">
                                     <input
@@ -795,7 +811,7 @@ export default function Form() {
                                             ? 'border-red-500 shadow-md shadow-red-300'
                                             : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'
                                             }`}
-                                        placeholder="اذكر المؤشر الثالت  "
+                                        placeholder={formFields.thirdIndicator?.placeholder || 'اذكر المؤشر الثالت  '}
 
                                     />
                                     {errors.thirdIndicator && (
@@ -817,7 +833,7 @@ export default function Form() {
                             {/* Challenges Row */}
                             <div className="grid grid-cols-1 md:grid-cols-2 border-b border-[#C2C1C1]">
                                 <div className="bg-[#0DA9A6] p-2 md:p-4 border-l border-[#C2C1C1] text-center font-semibold text-white">
-                                    الصعوبات/التحديات المحتملة
+                                    {formFields.potentialChallenges?.label || 'الصعوبات/التحديات المحتملة'}
                                 </div>
                                 <div className="p-2 md:p-4">
                                     <input
@@ -829,7 +845,7 @@ export default function Form() {
                                             ? 'border-red-500 shadow-md shadow-red-300'
                                             : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'
                                             }`}
-                                        placeholder="اذكر الصعوبات والتحديات المحتملة"
+                                        placeholder={formFields.potentialChallenges?.placeholder || 'اذكر الصعوبات والتحديات المحتملة'}
 
                                     />
                                     {errors.potentialChallenges && (
@@ -841,7 +857,7 @@ export default function Form() {
                             {/* Procedures Row */}
                             <div className="grid grid-cols-1 md:grid-cols-2 border-b border-[#C2C1C1]">
                                 <div className="bg-[#0DA9A6] p-2 md:p-4 border-l border-[#C2C1C1] text-center font-semibold text-white">
-                                    الإجراءات المقترحة للتعامل معها
+                                    {formFields.uniqueProcedures?.label || 'الإجراءات المقترحة للتعامل معها'}
                                 </div>
                                 <div className="p-2 md:p-4">
                                     <input
@@ -853,7 +869,7 @@ export default function Form() {
                                             ? 'border-red-500 shadow-md shadow-red-300'
                                             : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'
                                             }`}
-                                        placeholder="اذكر الإجراءات المقترحة"
+                                        placeholder={formFields.uniqueProcedures?.placeholder || 'اذكر الإجراءات المقترحة'}
 
                                     />
                                     {errors.uniqueProcedures && (
@@ -865,7 +881,7 @@ export default function Form() {
                             {/* Budget Row */}
                             <div className="grid grid-cols-1 md:grid-cols-2">
                                 <div className="bg-[#0DA9A6] p-2 md:p-4 border-l border-[#C2C1C1] text-center font-semibold text-white">
-                                    الموازنة التقديرية للمشروع/البرنامج
+                                    {formFields.projectBudget?.label || 'الموازنة التقديرية للمشروع/البرنامج'}
                                 </div>
                                 <div className="p-2 md:p-4">
                                     <input
@@ -877,7 +893,7 @@ export default function Form() {
                                             ? 'border-red-500 shadow-md shadow-red-300'
                                             : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'
                                             }`}
-                                        placeholder="أدخل الموازنة التقديرية"
+                                        placeholder={formFields.projectBudget?.placeholder || 'أدخل الموازنة التقديرية'}
 
                                     />
                                     {errors.projectBudget && (
@@ -900,7 +916,9 @@ export default function Form() {
                         <div className="md:hidden divide-y divide-[#C2C1C1]">
                             <div className="p-2 space-y-2">
                                 <div>
-                                    <label className="block text-[#15445A] font-semibold">الاسم</label>
+                                    <label className="block text-[#15445A] font-semibold">
+                                        {formFields.authorityName?.label || 'الاسم'}
+                                    </label>
                                     <input
                                         type="text"
                                         name="authorityName"
@@ -908,13 +926,15 @@ export default function Form() {
                                         onChange={handleInputChange}
                                         className={`w-full px-2 py-2 border rounded-md focus:outline-none focus:ring-2 text-[#15445A] ${errors.authorityName ? 'border-red-500 shadow-md shadow-red-300' : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'
                                             }`}
-                                        placeholder="اسم صاحب الصلاحية"
+                                        placeholder={formFields.authorityName?.placeholder || 'اسم صاحب الصلاحية'}
                                     />
                                     {errors.authorityName && <p className="text-red-500 text-sm mt-1">{errors.authorityName}</p>}
                                 </div>
 
                                 <div>
-                                    <label className="block text-[#15445A] font-semibold">التاريخ</label>
+                                    <label className="block text-[#15445A] font-semibold">
+                                        {formFields.authorityDate?.label || 'التاريخ'}
+                                    </label>
                                     <input
                                         type="date"
                                         name="authorityDate"
@@ -927,7 +947,9 @@ export default function Form() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-[#15445A] font-semibold">التوقيع</label>
+                                    <label className="block text-[#15445A] font-semibold">
+                                        {formFields.authoritySignature?.label || 'التوقيع'}
+                                    </label>
                                     <input
                                         type="text"
                                         name="authoritySignature"
@@ -935,7 +957,7 @@ export default function Form() {
                                         onChange={handleInputChange}
                                         className={`w-full px-2 py-2 border rounded-md focus:outline-none focus:ring-2 text-[#15445A] ${errors.authoritySignature ? 'border-red-500 shadow-md shadow-red-300' : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'
                                             }`}
-                                        placeholder="التوقيع"
+                                        placeholder={formFields.authoritySignature?.placeholder || 'التوقيع'}
                                     />
                                     {errors.authoritySignature && <p className="text-red-500 text-sm mt-1">{errors.authoritySignature}</p>}
                                 </div>
@@ -944,9 +966,15 @@ export default function Form() {
 
                         {/* للديسكتوب: صفوف أعمدة */}
                         <div className="hidden md:grid md:grid-cols-3 border-t border-[#C2C1C1]">
-                            <div className="bg-[#0DA9A6] p-2 md:p-4 border-l border-[#C2C1C1] text-center font-semibold text-white">الاسم</div>
-                            <div className="bg-[#0DA9A6] p-2 md:p-4 border-l border-[#C2C1C1] text-center font-semibold text-white">التاريخ</div>
-                            <div className="bg-[#0DA9A6] p-2 md:p-4 text-center font-semibold text-white">التوقيع )اختياري(</div>
+                            <div className="bg-[#0DA9A6] p-2 md:p-4 border-l border-[#C2C1C1] text-center font-semibold text-white">
+                                {formFields.authorityName?.label || 'الاسم'}
+                            </div>
+                            <div className="bg-[#0DA9A6] p-2 md:p-4 border-l border-[#C2C1C1] text-center font-semibold text-white">
+                                {formFields.authorityDate?.label || 'التاريخ'}
+                            </div>
+                            <div className="bg-[#0DA9A6] p-2 md:p-4 text-center font-semibold text-white">
+                                {formFields.authoritySignature?.label || 'التوقيع )اختياري('}
+                            </div>
                         </div>
 
                         <div className="hidden md:grid md:grid-cols-3 border-t border-[#C2C1C1]">
@@ -958,7 +986,7 @@ export default function Form() {
                                     onChange={handleInputChange}
                                     className={`w-full px-2 md:px-4 py-2 border rounded-md focus:outline-none focus:ring-2 text-[#15445A] ${errors.authorityName ? 'border-red-500 shadow-md shadow-red-300' : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'
                                         }`}
-                                    placeholder="اسم صاحب الصلاحية"
+                                    placeholder={formFields.authorityName?.placeholder || 'اسم صاحب الصلاحية'}
                                 />
                                 {errors.authorityName && <p className="text-red-500 text-sm mt-1">{errors.authorityName}</p>}
                             </div>
@@ -983,7 +1011,7 @@ export default function Form() {
                                     onChange={handleInputChange}
                                     className={`w-full px-2 md:px-4 py-2 border rounded-md focus:outline-none focus:ring-2 text-[#15445A] ${errors.authoritySignature ? 'border-red-500 shadow-md shadow-red-300' : 'border-[#C2C1C1] focus:ring-[#0DA9A6]'
                                         }`}
-                                    placeholder="التوقيع"
+                                    placeholder={formFields.authoritySignature?.placeholder || 'التوقيع'}
                                 />
                                 {errors.authoritySignature && <p className="text-red-500 text-sm mt-1">{errors.authoritySignature}</p>}
                             </div>
