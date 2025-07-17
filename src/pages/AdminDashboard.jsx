@@ -97,7 +97,7 @@ export default function AdminDashboard() {
   }, []);
 
   const handleEditForm = (form) => {
-    console.log('Editing form:', form);
+
     navigate('/form', { state: { mode: 'edit', data: form } });
   };
 
