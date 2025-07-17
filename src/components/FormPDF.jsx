@@ -100,6 +100,7 @@ const styles = StyleSheet.create({
 });
 
 const FormPDF = ({ form }) => (
+
     <Document>
         {/* Cover Page */}
         {/* <Page size="A4" orientation="landscape" style={[styles.page, styles.coverPage]}>
@@ -130,19 +131,20 @@ const FormPDF = ({ form }) => (
                 {/* Project name and owner */}
                 <View style={styles.tableRow}>
                     <View style={[styles.headerCell, styles.halfCell]}>
-                        <Text>مالك المشروع/البرنامج (إدارة/قسم)</Text>
+                        <Text>{form.ownerName?.label || ''}</Text>
                     </View>
                     <View style={[styles.headerCell, styles.halfCell]}>
-                        <Text>اسم المشروع/البرنامج</Text>
+                        <Text>{form.projectName?.label || ''}</Text>
                     </View>
 
                 </View>
                 <View style={styles.tableRow}>
                     <View style={[styles.cell, styles.halfCell,]}>
-                        <Text>{form.ownerName || ''}</Text>
+                        <Text>{form.ownerName?.value || ''}</Text>
                     </View>
+
                     <View style={[styles.cell, styles.halfCell]}>
-                        <Text>{form.projectName || ''}</Text>
+                        <Text>{form.projectName?.value || ''}</Text>
                     </View>
 
                 </View>
@@ -150,19 +152,19 @@ const FormPDF = ({ form }) => (
                 {/* Strategic objective and performance indicator */}
                 <View style={styles.tableRow}>
                     <View style={[styles.headerCell, styles.halfCell]}>
-                        <Text>مؤشر الأداء المستهدف</Text>
+                        <Text>{form.performanceIndicator?.label || ''}</Text>
                     </View>
                     <View style={[styles.headerCell, styles.halfCell]}>
-                        <Text>الهدف الاستراتيجي</Text>
+                        <Text>{form.strategicObjective?.label || ''}</Text>
                     </View>
 
                 </View>
                 <View style={styles.tableRow}>
                     <View style={[styles.cell, styles.halfCell]}>
-                        <Text>{form.performanceIndicator || ''}</Text>
+                        <Text>{form.performanceIndicator?.value || ''}</Text>
                     </View>
                     <View style={[styles.cell, styles.halfCell]}>
-                        <Text>{form.strategicObjective || ''}</Text>
+                        <Text>{form.strategicObjective?.value || ''}</Text>
                     </View>
 
                 </View>
@@ -170,19 +172,19 @@ const FormPDF = ({ form }) => (
                 {/* Previous and target readings */}
                 <View style={styles.tableRow}>
                     <View style={[styles.headerCell, styles.halfCell]}>
-                        <Text>القراءة المستهدفة للمؤشر</Text>
+                        <Text>{form.targetReading?.label || ''}</Text>
                     </View>
                     <View style={[styles.headerCell, styles.halfCell]}>
-                        <Text>القراءة السابقة للمؤشر</Text>
+                        <Text>{form.previousReading?.label || ''}</Text>
                     </View>
 
                 </View>
                 <View style={styles.tableRow}>
                     <View style={[styles.cell, styles.halfCell]}>
-                        <Text>{form.targetReading || ''}</Text>
+                        <Text>{form.targetReading?.value || ''}</Text>
                     </View>
                     <View style={[styles.cell, styles.halfCell]}>
-                        <Text>{form.previousReading || ''}</Text>
+                        <Text>{form.previousReading?.value || ''}</Text>
                     </View>
 
                 </View>
@@ -197,25 +199,25 @@ const FormPDF = ({ form }) => (
 
                 <View style={styles.tableRow}>
                     <View style={[styles.headerCell, { width: '33.33%' }]}>
-                        <Text>الهاتف الشبكي</Text>
+                        <Text>{form.networkPhone?.label || ''}</Text>
                     </View>
                     <View style={[styles.headerCell, { width: '33.33%' }]}>
-                        <Text>الجوال</Text>
+                        <Text>{form.phone?.label || ''}</Text>
                     </View>
                     <View style={[styles.headerCell, { width: '33.33%' }]}>
-                        <Text>البريد الإلكتروني الوزاري</Text>
+                        <Text>{form.email?.label || ''}</Text>
                     </View>
                 </View>
 
                 <View style={styles.tableRow}>
                     <View style={[styles.cell, { width: '33.33%' }]}>
-                        <Text>{form.networkPhone || ''}</Text>
+                        <Text>{form.networkPhone?.value || ''}</Text>
                     </View>
                     <View style={[styles.cell, { width: '33.33%' }]}>
-                        <Text>{form.phone || ''}</Text>
+                        <Text>{form.phone?.value || ''}</Text>
                     </View>
                     <View style={[styles.cell, { width: '33.33%' }]}>
-                        <Text>{form.email || ''}</Text>
+                        <Text>{form.email?.value || ''}</Text>
                     </View>
                 </View>
 
@@ -223,37 +225,37 @@ const FormPDF = ({ form }) => (
             {/* Project main objective */}
             <View style={styles.tableContainer} wrap={false}>
                 <View style={styles.tableRow}>
-                    <View style={[styles.cell, { width: '74.66%' }]}>
-                        <Text>{form.mainProjectObjective || ''}</Text>
+                    <View style={[styles.cell, { width: '73%' }]}>
+                        <Text>{form.mainProjectObjective?.value || ''}</Text>
                     </View>
-                    <View style={[styles.headerCell, { width: '25.33%' }]}>
-                        <Text>الهدف الرئيسىي</Text>
-                        <Text>للمشروع/البرنامج</Text>
+                    <View style={[styles.headerCell, { width: '27%' }]}>
+                        <Text>{form.mainProjectObjective?.label || ''}</Text>
+                        {/* <Text>للمشروع/البرنامج</Text> */}
                     </View>
                 </View>
 
                 {/* Implementation period */}
                 <View style={styles.tableRow}>
-                    <View style={[styles.cell, { width: '74.66%', flexDirection: 'row', justifyContent: 'flex-end' }]}>
-                        <Text style={{ marginLeft: 4 }}>{form.endDate || ''} </Text>
+                    <View style={[styles.cell, { width: '73%', flexDirection: 'row', justifyContent: 'flex-end' }]}>
+                        <Text >{form.endDate?.value || ''} </Text>
                         <Text> إلى</Text>
-                        <Text style={{ marginHorizontal: 6 }}>|</Text>
-                        <Text>{form.startDate || ''} </Text>
+                        <Text >|</Text>
+                        <Text>{form.startDate?.value || ''} </Text>
                         <Text> من</Text>
                     </View>
-                    <View style={[styles.headerCell, { width: '25.33%' }]}>
-                        <Text>فترة التنفيذ</Text>
+                    <View style={[styles.headerCell, { width: '27%' }]}>
+                        <Text>{form.startDate?.label || ''}</Text>
                     </View>
                 </View>
 
                 {/* Detailed project description */}
                 <View style={styles.tableRow}>
-                    <View style={[styles.cell, { width: '74.66%' }]}>
-                        <Text>{form.detailedProjectDescription || ''}</Text>
+                    <View style={[styles.cell, { width: '73%' }]}>
+                        <Text>{form.detailedProjectDescription?.value || ''}</Text>
                     </View>
-                    <View style={[styles.headerCell, { width: '25.33%' }]}>
-                        <Text>الوصف التفصيلي للمشروع/البرنامج</Text>
-                        <Text>يتضمن الأنشطة والمراحل التنفيذية</Text>
+                    <View style={[styles.headerCell, { width: '27%' }]}>
+                        <Text>{form.detailedProjectDescription?.label || ''}</Text>
+                        {/* <Text>يتضمن الأنشطة والمراحل التنفيذية</Text> */}
                     </View>
                 </View>
             </View>
@@ -261,24 +263,24 @@ const FormPDF = ({ form }) => (
             <View style={styles.tableContainer} wrap={false}>
                 <View style={styles.tableRow}>
                     <View style={[styles.headerCell, { width: '31%' }]}>
-                        <Text>الفئة/الجهة المستهدفة</Text>
+                        <Text>{form.targetGroup?.label || ''}</Text>
                     </View>
                     <View style={[styles.headerCell, { width: '38%' }]}>
-                        <Text>الجهة الداعمة (من خارج إدارة التعليم) شراكات إن وجدت</Text>
+                        <Text>{form.supportingAgency?.label || ''}</Text>
                     </View>
                     <View style={[styles.headerCell, { width: '31%' }]}>
-                        <Text>الإدارة المساندة (من داخل إدارة التعليم) إن وجدت</Text>
+                        <Text>{form.supportingManagement?.label || ''}</Text>
                     </View>
                 </View>
                 <View style={[styles.tableRow]}>
                     <View style={[styles.cell, { width: '31%' }]}>
-                        <Text>{form.targetGroup || ''}</Text>
+                        <Text>{form.targetGroup?.value || ''}</Text>
                     </View>
                     <View style={[styles.cell, { width: '38%' }]}>
-                        <Text>{form.supportingAgency || ''}</Text>
+                        <Text>{form.supportingAgency?.value || ''}</Text>
                     </View>
                     <View style={[styles.cell, { width: '31%' }]}>
-                        <Text>{form.supportingManagement || ''}</Text>
+                        <Text>{form.supportingManagement?.value || ''}</Text>
                     </View>
                 </View>
             </View>
@@ -295,13 +297,13 @@ const FormPDF = ({ form }) => (
                 <View style={styles.tableRow} >
 
                     <View style={[styles.headerCell, { width: '32%' }]}>
-                        <Text>جهة العمل</Text>
+                        <Text>{form.workType?.label || ''}</Text>
                     </View>
                     <View style={[styles.headerCell, { width: '32%' }]}>
-                        <Text>الوظيفة</Text>
+                        <Text>{form.position?.label || ''}</Text>
                     </View>
                     <View style={[styles.headerCell, { width: '32%' }]}>
-                        <Text>الاسم</Text>
+                        <Text>{form.name?.label || ''}</Text>
                     </View>
                     <View style={[styles.headerCell, { width: '4%' }]}>
                         <Text>م</Text>
@@ -314,13 +316,13 @@ const FormPDF = ({ form }) => (
                         form.teamMembers.map((member, idx) => (
                             <View key={idx} style={styles.tableRow}>
                                 <View style={[styles.cell, { width: '32%' }]}>
-                                    <Text>{member.workType || ''}</Text>
+                                    <Text>{member.workType?.value || ''}</Text>
                                 </View>
                                 <View style={[styles.cell, { width: '32%' }]}>
-                                    <Text>{member.position || ''}</Text>
+                                    <Text>{member.position?.value || ''}</Text>
                                 </View>
                                 <View style={[styles.cell, { width: '32%' }]}>
-                                    <Text>{member.name || ''}</Text>
+                                    <Text>{member.name?.value || ''}</Text>
                                 </View>
                                 <View style={[styles.cell, { width: '4%' }]}>
                                     <Text>{idx + 1}</Text>
@@ -356,24 +358,24 @@ const FormPDF = ({ form }) => (
                 </View>
                 <View style={styles.tableRow}>
                     <View style={[styles.headerCell, { width: '33.33%' }]}>
-                        <Text>المؤشر الثالث:</Text>
+                        <Text>{form.thirdIndicator?.label || ''}</Text>
                     </View>
                     <View style={[styles.headerCell, { width: '33.33%' }]}>
-                        <Text>المؤشر الثاني:</Text>
+                        <Text>{form.secondIndicator?.label || ''}</Text>
                     </View>
                     <View style={[styles.headerCell, { width: '33.33%' }]}>
-                        <Text>المؤشر الأول:</Text>
+                        <Text>{form.firstIndicator?.label || ''}</Text>
                     </View>
                 </View>
                 <View style={styles.tableRow}>
                     <View style={[styles.cell, { width: '33.33%' }]}>
-                        <Text>{form.thirdIndicator || ''}</Text>
+                        <Text>{form.thirdIndicator?.value || ''}</Text>
                     </View>
                     <View style={[styles.cell, { width: '33.33%' }]}>
-                        <Text>{form.secondIndicator || ''}</Text>
+                        <Text>{form.secondIndicator?.value || ''}</Text>
                     </View>
                     <View style={[styles.cell, { width: '33.33%' }]}>
-                        <Text>{form.firstIndicator || ''}</Text>
+                        <Text>{form.firstIndicator?.value || ''}</Text>
                     </View>
                 </View>
             </View>
@@ -382,20 +384,20 @@ const FormPDF = ({ form }) => (
             <View style={styles.tableContainer}  >
                 <View style={styles.tableRow} wrap={false}>
                     <View style={[styles.cell, { width: '75%' }]}>
-                        <Text>{form.potentialChallenges || ''}</Text>
+                        <Text>{form.potentialChallenges?.value || ''}</Text>
                     </View>
                     <View style={[styles.headerCell, { width: '25%' }]}>
-                        <Text>الصعوبات/التحديات المحتملة</Text>
+                        <Text>{form.potentialChallenges?.label || ''}</Text>
                     </View>
                 </View>
 
                 {/* Proposed procedures */}
                 <View style={styles.tableRow} wrap={false}>
                     <View style={[styles.cell, { width: '75%' }]}>
-                        <Text>{form.uniqueProcedures || ''}</Text>
+                        <Text>{form.uniqueProcedures?.value || ''}</Text>
                     </View>
                     <View style={[styles.headerCell, { width: '25%' }]}>
-                        <Text>الإجراءات المقترحة للتعامل معها</Text>
+                        <Text>{form.uniqueProcedures?.label || ''}</Text>
                     </View>
                 </View>
 
@@ -404,10 +406,10 @@ const FormPDF = ({ form }) => (
                 <View style={[styles.tableRow]} wrap={false}>
 
                     <View style={[styles.cell, { width: '75%' }]}>
-                        <Text>{form.projectBudget || ''}</Text>
+                        <Text>{form.projectBudget?.value || ''}</Text>
                     </View>
                     <View style={[styles.headerCell, { width: '25%' }]}>
-                        <Text>الموازنة التقديرية للمشروع/البرنامج</Text>
+                        <Text>{form.projectBudget?.label || ''}</Text>
                     </View>
                 </View>
             </View>
@@ -419,25 +421,25 @@ const FormPDF = ({ form }) => (
 
                 <View style={styles.tableRow}>
                     <View style={[styles.headerCell, { width: '33.33%' }]}>
-                        <Text>التوقيع</Text>
+                        <Text>{form.authoritySignature?.label || ''}</Text>
                     </View>
                     <View style={[styles.headerCell, { width: '33.33%' }]}>
-                        <Text>التاريخ</Text>
+                        <Text>{form.authorityDate?.label || ''}</Text>
                     </View>
                     <View style={[styles.headerCell, { width: '33.33%' }]}>
-                        <Text>الاسم</Text>
+                        <Text>{form.authorityName?.label || ''}</Text>
                     </View>
                 </View>
 
                 <View style={[styles.tableRow, { borderBottom: 'none' }]}>
                     <View style={[styles.cell, { width: '33.33%', minHeight: 40 }]}>
-                        <Text>{form.authoritySignature || ''}</Text>
+                        <Text>{form.authoritySignature?.value || ''}</Text>
                     </View>
                     <View style={[styles.cell, { width: '33.33%', minHeight: 40 }]}>
-                        <Text>{form.authorityDate || ''}</Text>
+                        <Text>{form.authorityDate?.value || ''}</Text>
                     </View>
                     <View style={[styles.cell, { width: '33.33%', minHeight: 40 }]}>
-                        <Text>{form.authorityName || ''}</Text>
+                        <Text>{form.authorityName?.value || ''}</Text>
                     </View>
                 </View>
             </View>

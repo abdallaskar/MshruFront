@@ -4,6 +4,7 @@ import axiosInstance from '../api/axios';
 import { BarChart3, Users, FileText, TrendingUp, Eye, Edit, Download, Settings, Activity } from 'lucide-react';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import FormPDF from '../components/FormPDF';
+import { toast } from 'react-toastify';
 
 export default function AdminDashboard() {
 
@@ -43,21 +44,33 @@ export default function AdminDashboard() {
   const handleAllFieldsUpdate = async () => {
     try {
       await axiosInstance.put(`/config/`, { fields });
-      alert('تم حفظ جميع التعديلات بنجاح');
+      toast.success('تم حفظ جميع التعديلات بنجاح', {
+        position: "top-center",
+        className: 'custom-toast',
+      });
       fetchFields();
     } catch (error) {
       console.error("Error updating fields:", error);
-      alert('حدث خطأ أثناء حفظ التعديلات');
+      toast.error('حدث خطأ أثناء حفظ التعديلات', {
+        position: "top-center",
+        className: 'custom-toast',
+      });
     }
   };
   const handleResetFields = async () => {
     try {
       await axiosInstance.post(`/config/reset`);
-      alert('تم إعادة الحقول إلى الإعدادات الافتراضية');
+      toast.success('تم إعادة الحقول إلى الإعدادات الافتراضية', {
+        position: "top-center",
+        className: 'custom-toast',
+      });
       fetchFields();
     } catch (error) {
       console.error("Error resetting fields:", error);
-      alert('حدث خطأ أثناء إعادة الحقول');
+      toast.error('حدث خطأ أثناء إعادة الحقول', {
+        position: "top-center",
+        className: 'custom-toast',
+      });
     }
   }
 
@@ -84,6 +97,7 @@ export default function AdminDashboard() {
   }, []);
 
   const handleEditForm = (form) => {
+    console.log('Editing form:', form);
     navigate('/form', { state: { mode: 'edit', data: form } });
   };
 
@@ -94,7 +108,7 @@ export default function AdminDashboard() {
     const url = window.URL.createObjectURL(new Blob([res.data]));
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `${form.projectName}.docx`);
+    link.setAttribute('download', `${form.projectName?.value}.docx`);
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -245,12 +259,12 @@ export default function AdminDashboard() {
               {forms.map((form) => (
                 <tr
                   key={form._id}
-                  className="border-t border-[#C2C1C1] hover:bg-[#F9F9F9] transition-colors text-[#15445A]"
+                  className="border-t border-[#C2C1C1] hover:bg-[#090707] transition-colors text-[#15445A]"
                 >
-                  <td className="p-3 border-l border-[#C2C1C1]">{form.projectName}</td>
-                  <td className="p-3 border-l border-[#C2C1C1]">{form.strategicObjective}</td>
-                  <td className="p-3 border-l border-[#C2C1C1]">{form.ownerName}</td>
-                  <td className="p-3 border-l border-[#C2C1C1]">{form.email}</td>
+                  <td className="p-3 border-l border-[#C2C1C1]">{form.projectName.value}</td>
+                  <td className="p-3 border-l border-[#C2C1C1]">{form.strategicObjective.value}</td>
+                  <td className="p-3 border-l border-[#C2C1C1]">{form.ownerName.value}</td>
+                  <td className="p-3 border-l border-[#C2C1C1]">{form.email.value}</td>
                   <td className="p-3 border-l border-[#C2C1C1]">
                     <button
                       onClick={() => handleEditForm(form)}
@@ -263,7 +277,7 @@ export default function AdminDashboard() {
                   <td className="p-3 border-l border-[#C2C1C1]">
                     <PDFDownloadLink
                       document={<FormPDF form={form} />}
-                      fileName={`form-${form.projectName}.pdf`}
+                      fileName={`form-${form.projectName?.value}.pdf`}
                       className="bg-[#0DA9A6] hover:bg-[#0C8B8A] text-white px-3 py-1 rounded inline-flex items-center gap-1 transition-colors cursor-pointer"
                     >
                       {({ loading }) =>
